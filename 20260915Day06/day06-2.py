@@ -7,21 +7,34 @@ import requests
 import streamlit as st
 from streamlit_folium import st_folium
 
-# 1. 상위 폴더의 .env 파일 로드
-current_dir = Path(__file__).resolve().parent
-parent_env_path = current_dir.parent / ".env"
-load_dotenv(dotenv_path=parent_env_path)
+# ---------------- 1. API 키 로드 (Streamlit Secrets 및 .env 동시 지원) ----------------
 
-KAKAO_REST_KEY = os.getenv("KAKAO_REST_API_KEY")
-OPENWEATHER_KEY = os.getenv("OPENWEATHER_API_KEY")
-EXCHANGERATE_KEY = os.getenv("EXCHANGERATE_API_KEY")
+# 1) 로컬 개발 환경용 .env 로드 (현재 폴더 및 상위 폴더 탐색)
+current_dir = Path(__file__).resolve().parent
+load_dotenv(dotenv_path=current_dir / ".env")
+load_dotenv(dotenv_path=current_dir.parent / ".env")
+load_dotenv()
+
+# 2) Streamlit Cloud(st.secrets) 우선 탐색 후 로컬 os.getenv 탐색
+def get_api_key(key_name):
+    try:
+        if key_name in st.secrets:
+            return st.secrets[key_name]
+    except Exception:
+        pass
+    return os.getenv(key_name)
+
+KAKAO_REST_KEY = get_api_key("KAKAO_REST_API_KEY")
+OPENWEATHER_KEY = get_api_key("OPENWEATHER_API_KEY")
+EXCHANGERATE_KEY = get_api_key("EXCHANGERATE_API_KEY")
 
 st.set_page_config(page_title="국내 여행 포털", page_icon="🇰🇷", layout="wide")
 st.title("🇰🇷 대한민국 국내 여행 도우미 (명소 검색 · 현지 날씨 · 환율)")
 
 
-# ---------------- API 함수 정의 ----------------
+# ---------------- 2. API 호출 함수 정의 ----------------
 
+# 1) 카카오 로컬 REST API 키워드 검색
 def search_places_kakao(query, api_key):
     url = "https://dapi.kakao.com/v2/local/search/keyword.json"
     headers = {"Authorization": f"KakaoAK {api_key}"}
@@ -32,15 +45,15 @@ def search_places_kakao(query, api_key):
     except Exception:
         return []
 
-
+# 2) OpenWeatherMap 실시간 날씨 API (위도/경도 기준)
 def get_weather_by_coords(lat, lon, api_key):
     url = "https://api.openweathermap.org/data/2.5/weather"
     params = {
         "lat": lat,
         "lon": lon,
         "appid": api_key,
-        "units": "metric",
-        "lang": "kr"
+        "units": "metric",  # 섭씨 온도
+        "lang": "kr"         # 한국어 설명
     }
     try:
         res = requests.get(url, params=params, timeout=5)
@@ -48,7 +61,7 @@ def get_weather_by_coords(lat, lon, api_key):
     except Exception:
         return None
 
-
+# 3) ExchangeRate-API 실시간 환율 API
 def get_exchange_rates(base_currency, api_key):
     url = f"https://v6.exchangerate-api.com/v6/{api_key}/latest/{base_currency}"
     try:
@@ -59,10 +72,12 @@ def get_exchange_rates(base_currency, api_key):
         return {}
 
 
-# ---------------- 사이드바: 환율 계산기 ----------------
+# ---------------- 3. 사이드바: 환율 계산기 ----------------
 
 with st.sidebar:
     st.header("💱 여행 경비 환율 계산기")
+    st.caption("외국 통화를 실시간 원화(KRW)로 바로 환산합니다.")
+
     currency_map = {
         "미국 달러 (USD)": "USD",
         "일본 엔 (JPY, 100엔)": "JPY",
@@ -79,30 +94,35 @@ with st.sidebar:
         if krw_rate:
             if target_currency == "JPY":
                 total_krw = (amount / 100) * krw_rate
-                st.success(f"**{amount:,.0f} JPY** ≈ **{total_krw:,.0f} 원**")
+                st.success(f"**{amount:,.0f} JPY** ≈ **{total_krw:,.0f} 원 (KRW)**")
+                st.caption(f"적용 환율: 100 JPY = {krw_rate:,.2f} KRW")
             else:
                 total_krw = amount * krw_rate
-                st.success(f"**{amount:,.2f} {target_currency}** ≈ **{total_krw:,.0f} 원**")
+                st.success(f"**{amount:,.2f} {target_currency}** ≈ **{total_krw:,.0f} 원 (KRW)**")
+                st.caption(f"적용 환율: 1 {target_currency} = {krw_rate:,.2f} KRW")
+        else:
+            st.warning("환율 데이터를 불러오지 못했습니다.")
     else:
-        st.info("💡 `.env`에 `EXCHANGERATE_API_KEY`를 설정하세요.")
+        st.info("💡 `EXCHANGERATE_API_KEY`를 설정하세요.")
 
 
-# ---------------- 메인 화면: 검색 및 상호작용 ----------------
+# ---------------- 4. 메인 화면: 국내 여행지 검색 & 지도 / 날씨 연동 ----------------
 
 st.subheader("📍 국내 관광지 / 명소 검색")
-keyword = st.text_input("목적지를 입력하세요", value="강남역", placeholder="예: 강남역, 경복궁, 제주도 카페")
+keyword = st.text_input("목적지를 입력하세요", value="강남역", placeholder="예: 강남역, 경복궁, 해운대, 성산일출봉")
 
 if keyword:
     if not KAKAO_REST_KEY:
-        st.error("⚠️ `.env` 파일에 `KAKAO_REST_API_KEY`가 설정되어 있지 않습니다.")
+        st.error("⚠️ `KAKAO_REST_API_KEY`가 설정되어 있지 않습니다. (.env 또는 Streamlit Cloud Settings > Secrets 확인)")
         st.stop()
 
-    places = search_places_kakao(keyword, KAKAO_REST_KEY)
+    with st.spinner(f"'{keyword}' 검색 중..."):
+        places = search_places_kakao(keyword, KAKAO_REST_KEY)
 
     if not places:
-        st.warning("검색 결과가 없습니다.")
+        st.warning("검색 결과가 없습니다. 다른 키워드로 검색해보세요.")
     else:
-        # 데이터프레임 변환
+        # 검색 결과 DataFrame 구성
         df_places = pd.DataFrame([
             {
                 "관광지명": p["place_name"],
@@ -115,21 +135,18 @@ if keyword:
             for p in places
         ])
 
-        # 기본 선택 인덱스 초기화
-        if "selected_idx" not in st.session_state:
+        # 선택 인덱스 세션 상태 관리
+        if "selected_idx" not in st.session_state or st.session_state.selected_idx >= len(df_places):
             st.session_state.selected_idx = 0
 
-        # 좌우 배치 칼럼
-        col_map, col_list = st.columns([1, 1])
-
-        # 현재 선택된 장소 데이터
+        # 현재 선택된 목적지 정보 추출
         current_place = df_places.iloc[st.session_state.selected_idx]
         target_lat = current_place["lat"]
         target_lon = current_place["lon"]
         target_name = current_place["관광지명"]
         target_address = current_place["주소"]
 
-        # --- 선택 목적지 실시간 날씨 위젯 (상단 배치) ---
+        # --- 목적지 실시간 날씨 표시 (상단 위젯) ---
         st.markdown(f"### 🌤️ **[{target_name}]** 현지 실시간 날씨")
         
         if OPENWEATHER_KEY:
@@ -152,10 +169,17 @@ if keyword:
                 with w4:
                     st.write(f"**습도:** {humidity}%")
                     st.write(f"**주소:** {target_address}")
-        
+            else:
+                st.warning("선택된 목적지의 날씨 정보를 가져올 수 없습니다.")
+        else:
+            st.info("💡 `OPENWEATHER_API_KEY`를 설정하면 실시간 날씨가 표시됩니다.")
+
         st.divider()
 
-        # --- 좌측 Folium 지도 렌더링 (높이 380px) ---
+        # 좌우 균등 칼럼 배치 (1:1)
+        col_map, col_list = st.columns([1, 1])
+
+        # --- 좌측: Folium 지도 (높이 380px) ---
         with col_map:
             st.subheader("🗺️ 목적지 위치 지도")
             
@@ -187,9 +211,10 @@ if keyword:
 
             st_folium(m, width="100%", height=380, returned_objects=[])
 
-        # --- 우측 목록 표 렌더링 (지도와 동일하게 높이 380px 고정) ---
+        # --- 우측: 주변 검색 목록 (지도와 동일하게 높이 380px) ---
         with col_list:
             st.subheader("📋 주변 검색 목록")
+            st.caption("👇 표에서 원하는 행을 클릭하면 해당 위치의 날씨와 지도 마커가 변경됩니다.")
             
             event = st.dataframe(
                 df_places[["관광지명", "주소", "전화번호"]],
@@ -200,7 +225,7 @@ if keyword:
                 selection_mode="single-row"
             )
 
-            # 표에서 클릭한 행 인덱스 적용
+            # 표 행 클릭 이벤트 처리
             selected_rows = event.selection.get("rows", [])
             if selected_rows:
                 st.session_state.selected_idx = selected_rows[0]
