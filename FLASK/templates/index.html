@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오늘의 한 줄 조언</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="card">
+        <span class="label">💡 TODAY'S ADVICE {% if advice_id %}#{{ advice_id }}{% endif %}</span>
+        <blockquote class="advice-text">
+            "{{ advice }}"
+        </blockquote>
+        <button onclick="window.location.reload();" class="refresh-btn">새로운 명언 보기</button>
+    </div>
+</body>
+</html>

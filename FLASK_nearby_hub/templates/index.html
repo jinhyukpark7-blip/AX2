@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주변 생활 편의 탐색기</title>
+    <!-- Leaflet OpenStreetMap CDN (인증키 불필요) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- 1. 지도 컨테이너 -->
+        <div class="map-container">
+            <!-- 상단 검색창 및 컨트롤러 -->
+            <div class="top-controls">
+                <form id="search-form" onsubmit="searchLocation(event)">
+                    <input type="text" id="search-keyword" placeholder="지하철역, 동 이름, 건물명 검색 (예: 강남역, 여의도동, 잠실역)" autocomplete="off">
+                    <button type="submit" id="search-btn">검색</button>
+                </form>
+
+                <button type="button" id="lock-btn" class="lock-btn" onclick="toggleLocationLock()">
+                    <span id="lock-icon">🔓</span>
+                    <span id="lock-text">위치 고정</span>
+                </button>
+            </div>
+
+            <div id="map"></div>
+
+            <!-- 하단 안내 배지 -->
+            <div id="guide-badge" class="guide-badge">
+                💡 장소를 검색하거나 지도를 클릭하여 핀을 놓은 뒤 <b>[위치 고정]</b>을 누르세요.
+            </div>
+        </div>
+
+        <!-- 2. 사이드바 -->
+        <aside class="sidebar">
+            <header class="sidebar-header">
+                <div class="header-status-box">
+                    <h2>📍 선택 위치 편의시설</h2>
+                    <span id="status-tag" class="status-tag unlocked">수정 가능</span>
+                </div>
+                <p id="picked-location-name">장소를 검색하거나 지도에서 선택하세요.</p>
+                <p id="picked-coords" class="sub-coords">-</p>
+            </header>
+
+            <div class="facility-list">
+                <!-- 1. 지하철역 -->
+                <div class="facility-card" id="card-subway">
+                    <div class="card-icon">🚇</div>
+                    <div class="card-info">
+                        <span class="category-label">가장 가까운 지하철역</span>
+                        <h4 class="facility-name">-</h4>
+                        <p class="facility-dist">-</p>
+                    </div>
+                    <a class="nav-btn disabled" href="#" target="_blank">가는 방법</a>
+                </div>
+
+                <!-- 2. 버스정류장 -->
+                <div class="facility-card" id="card-bus">
+                    <div class="card-icon">🚏</div>
+                    <div class="card-info">
+                        <span class="category-label">가장 가까운 버스정류장</span>
+                        <h4 class="facility-name">-</h4>
+                        <p class="facility-dist">-</p>
+                    </div>
+                    <a class="nav-btn disabled" href="#" target="_blank">가는 방법</a>
+                </div>
+
+                <!-- 3. 편의점 -->
+                <div class="facility-card" id="card-cs">
+                    <div class="card-icon">🏪</div>
+                    <div class="card-info">
+                        <span class="category-label">가장 가까운 편의점</span>
+                        <h4 class="facility-name">-</h4>
+                        <p class="facility-dist">-</p>
+                    </div>
+                    <a class="nav-btn disabled" href="#" target="_blank">가는 방법</a>
+                </div>
+
+                <!-- 4. 무인택배함 -->
+                <div class="facility-card" id="card-locker">
+                    <div class="card-icon">📦</div>
+                    <div class="card-info">
+                        <span class="category-label">가장 가까운 무인택배함/사물함</span>
+                        <h4 class="facility-name">-</h4>
+                        <p class="facility-dist">-</p>
+                    </div>
+                    <a class="nav-btn disabled" href="#" target="_blank">가는 방법</a>
+                </div>
+
+                <!-- 5. 24시간 식당 -->
+                <div class="facility-card" id="card-food-24">
+                    <div class="card-icon">🍲</div>
+                    <div class="card-info">
+                        <span class="category-label">24시간 식당</span>
+                        <h4 class="facility-name">-</h4>
+                        <p class="facility-dist">-</p>
+                    </div>
+                    <a class="nav-btn disabled" href="#" target="_blank">가는 방법</a>
+                </div>
+
+                <!-- 6. 일반 식당 -->
+                <div class="facility-card" id="card-food">
+                    <div class="card-icon">🍴</div>
+                    <div class="card-info">
+                        <span class="category-label">가장 가까운 일반 식당</span>
+                        <h4 class="facility-name">-</h4>
+                        <p class="facility-dist">-</p>
+                    </div>
+                    <a class="nav-btn disabled" href="#" target="_blank">가는 방법</a>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/map.js') }}"></script>
+</body>
+</html>
