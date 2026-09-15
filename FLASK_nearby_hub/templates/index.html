@@ -11,9 +11,8 @@
 <body>
     <div class="dashboard-container">
         
-        <!-- [상단 영역]: 지도(축소) + 선택 위치 편의시설 정보 -->
+        <!-- [상단 영역]: 지도 + 선택 위치 편의시설 정보 -->
         <section class="top-section">
-            <!-- 1. 컴팩트 지도 (2/5 사이즈) -->
             <div class="map-card">
                 <div class="map-header">
                     <div class="search-box">
@@ -33,10 +32,9 @@
                 </div>
             </div>
 
-            <!-- 2. 내 주변 편의시설 요약 -->
             <div class="facility-summary-card">
                 <div class="section-title-box">
-                    <h3>📍 핀 위치 주변 편의시설</h3>
+                    <h3>📍 핀 위치 주변 주요 시설</h3>
                     <span id="status-tag" class="status-tag unlocked">수정 가능</span>
                 </div>
                 <p id="picked-location-name" class="picked-name">서울특별시청</p>
@@ -94,6 +92,58 @@
             </div>
         </section>
 
+        <!-- [중단 영역]: 신규 추가! 오늘의 한끼 / 오늘은 뭐 먹지 / 오늘의 편의점 -->
+        <section class="food-convenience-section">
+            <div class="food-tabs-header">
+                <button class="tab-menu active" onclick="switchFoodTab('tab-meal')">🍴 오늘의 한끼 (도보 10분)</button>
+                <button class="tab-menu" onclick="switchFoodTab('tab-roulette')">🎰 오늘은 뭐 먹지? (룰렛)</button>
+                <button class="tab-menu" onclick="switchFoodTab('tab-cvs')">🏪 오늘의 편의점 & 재고찾기</button>
+            </div>
+
+            <!-- 1. 오늘의 한끼 (도보 10분 식당 목록) -->
+            <div id="tab-meal" class="food-tab-content">
+                <div class="tab-desc">
+                    <h4>🚶‍♂️ 핀 기준 도보 10분(약 800m) 이내 식당 리스트</h4>
+                    <span id="meal-count-badge" class="count-badge">0곳 발견</span>
+                </div>
+                <div id="meal-list-container" class="meal-grid">
+                    <p class="empty-msg">주변 식당을 탐색 중입니다...</p>
+                </div>
+            </div>
+
+            <!-- 2. 오늘은 뭐 먹지 (원형 룰렛) -->
+            <div id="tab-roulette" class="food-tab-content hidden">
+                <div class="roulette-layout">
+                    <div class="roulette-box">
+                        <div class="roulette-pointer">▼</div>
+                        <canvas id="roulette-canvas" width="360" height="360"></canvas>
+                        <button id="roulette-spin-btn" class="spin-btn" onclick="spinRoulette()">🎯 룰렛 돌리기!</button>
+                    </div>
+                    <div class="roulette-result-box">
+                        <h3>🎉 오늘 추천된 식당</h3>
+                        <div id="roulette-winner-card" class="winner-card">
+                            <p class="winner-placeholder">룰렛 돌리기 버튼을 눌러보세요!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. 오늘의 편의점 (편의점 목록 + 재고조회 링크) -->
+            <div id="tab-cvs" class="food-tab-content hidden">
+                <div class="cvs-util-banner">
+                    <p>💡 <b>편의점 상품/재고 & 좌석 확인 안내</b>: 실시간 재고 및 행사 상품은 브랜드별 앱/웹 조회를 활용해보세요.</p>
+                    <div class="cvs-quick-links">
+                        <a href="https://cu.bgfretail.com/store/list.do" target="_blank" class="cvs-badge cu">CU 매장/재고 ↗</a>
+                        <a href="https://woodongs.page.link/find" target="_blank" class="cvs-badge gs">GS25 우리동네GS ↗</a>
+                        <a href="https://www.7-eleven.co.kr/store/list.asp" target="_blank" class="cvs-badge seven">세븐일레븐 매장 ↗</a>
+                    </div>
+                </div>
+                <div id="cvs-list-container" class="meal-grid">
+                    <p class="empty-msg">주변 편의점을 탐색 중입니다...</p>
+                </div>
+            </div>
+        </section>
+
         <!-- [하단 영역]: 경유지 대중교통 경로 프로그램 -->
         <section class="bottom-transit-section">
             <div class="transit-banner">
@@ -101,7 +151,6 @@
                 <p>출발지에서 경유지를 거쳐 최종 목적지까지 가는 최적의 대중교통 경로와 환승할인 절약 공략법을 안내합니다.</p>
             </div>
 
-            <!-- 입력 폼 -->
             <div class="transit-form-container">
                 <div class="route-inputs">
                     <div class="input-group">
@@ -120,7 +169,6 @@
                     </div>
                 </div>
 
-                <!-- 옵션 선택 탭 -->
                 <div class="option-tabs">
                     <label class="tab-radio">
                         <input type="radio" name="route-option" value="fastest" checked onchange="toggleOptionView()">
@@ -132,7 +180,6 @@
                     </label>
                 </div>
 
-                <!-- 옵션 2 전용 세부 입력란 -->
                 <div id="cheapest-detail-box" class="cheapest-detail-box hidden">
                     <div class="sub-info-row">
                         <div class="sub-input">
@@ -150,18 +197,15 @@
                         </div>
                     </div>
                     <div class="transfer-notice">
-                        💡 <b>수도권 환승할인 팁</b>: 경유지에서 하차 후 <b>30분 이내</b> 다른 번호의 버스나 지하철로 환승 시 기본요금(1,400~1,500원)이 면제됩니다. (동일 노선 버스 환승 불가)
+                        💡 <b>수도권 환승할인 팁</b>: 경유지에서 하차 후 <b>30분 이내</b> 다른 번호의 버스나 지하철로 환승 시 기본요금(1,400~1,500원)이 면제됩니다.
                     </div>
                 </div>
 
                 <button class="calc-btn" onclick="calculateTransitRoute()">🚀 대중교통 경로 찾기</button>
             </div>
 
-            <!-- 결과 표시 창 -->
             <div id="route-result-container" class="route-result-container hidden">
-                <div class="result-card" id="result-content">
-                    <!-- 결과가 JS로 동적 렌더링됩니다 -->
-                </div>
+                <div class="result-card" id="result-content"></div>
             </div>
         </section>
 

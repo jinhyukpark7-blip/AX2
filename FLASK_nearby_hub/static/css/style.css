@@ -21,14 +21,13 @@ body {
     gap: 16px;
 }
 
-/* ================== 상단 섹션 (지도 2/5 + 요약정보) ================== */
+/* ================== 상단 섹션 (지도 + 편의시설 요약) ================== */
 .top-section {
     display: flex;
     gap: 16px;
     min-height: 380px;
 }
 
-/* 지도 영역 (약 40% 너비, 360px 높이로 축소) */
 .map-card {
     flex: 0 0 42%;
     background: #ffffff;
@@ -120,7 +119,6 @@ body {
     pointer-events: none;
 }
 
-/* 편의시설 요약 카드 */
 .facility-summary-card {
     flex: 1;
     background: #ffffff;
@@ -213,6 +211,246 @@ body {
     pointer-events: none;
 }
 
+/* ================== 신규 추가: 오늘의 한끼 / 룰렛 / 편의점 섹션 ================== */
+.food-convenience-section {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    border: 1px solid #e2e8f0;
+}
+
+.food-tabs-header {
+    display: flex;
+    gap: 8px;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 12px;
+}
+
+.tab-menu {
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tab-menu.active {
+    background: #4f46e5;
+    color: #ffffff;
+    border-color: #4338ca;
+}
+
+.food-tab-content {
+    margin-top: 16px;
+}
+
+.tab-desc {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.tab-desc h4 {
+    font-size: 0.95rem;
+    color: #334155;
+}
+
+.count-badge {
+    background: #eef2ff;
+    color: #4f46e5;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+}
+
+/* 리스트 그리드 */
+.meal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+    max-height: 280px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.food-item-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.food-item-card .title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.food-item-card h5 {
+    font-size: 0.9rem;
+    color: #1e293b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+.food-type-tag {
+    font-size: 0.72rem;
+    background: #e2e8f0;
+    color: #475569;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.food-item-card .dist-text {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin: 6px 0;
+}
+
+.food-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.food-actions a {
+    flex: 1;
+    text-align: center;
+    font-size: 0.75rem;
+    padding: 5px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.btn-route { background: #e0e7ff; color: #3730a3; }
+.btn-review { background: #f1f5f9; color: #475569; }
+
+/* 룰렛 스타일 */
+.roulette-layout {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 0;
+}
+
+.roulette-box {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.roulette-pointer {
+    position: absolute;
+    top: -12px;
+    font-size: 1.5rem;
+    color: #ef4444;
+    z-index: 10;
+}
+
+#roulette-canvas {
+    border-radius: 50%;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    background: #ffffff;
+}
+
+.spin-btn {
+    margin-top: 14px;
+    background: #4f46e5;
+    color: #fff;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 24px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.spin-btn:disabled {
+    background: #cbd5e1;
+    cursor: not-allowed;
+}
+
+.roulette-result-box {
+    flex: 1;
+    max-width: 320px;
+    background: #f8fafc;
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+}
+
+.roulette-result-box h3 {
+    font-size: 1.05rem;
+    color: #334155;
+    margin-bottom: 12px;
+}
+
+.winner-card {
+    min-height: 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.winner-name {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #4f46e5;
+    margin-bottom: 6px;
+}
+
+/* 편의점 배너 링크 */
+.cvs-util-banner {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.cvs-util-banner p {
+    font-size: 0.85rem;
+    color: #475569;
+}
+
+.cvs-quick-links {
+    display: flex;
+    gap: 8px;
+}
+
+.cvs-badge {
+    text-decoration: none;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 5px 10px;
+    border-radius: 6px;
+}
+.cvs-badge.cu { background: #dcfce7; color: #166534; }
+.cvs-badge.gs { background: #dbeafe; color: #1e40af; }
+.cvs-badge.seven { background: #fee2e2; color: #991b1b; }
+
 /* ================== 하단 경유 대중교통 섹션 ================== */
 .bottom-transit-section {
     background: #ffffff;
@@ -287,7 +525,6 @@ body {
     font-weight: bold;
 }
 
-/* 옵션 탭 */
 .option-tabs {
     display: flex;
     gap: 16px;
@@ -312,7 +549,6 @@ body {
     color: #4f46e5;
 }
 
-/* 최소 비용 추가 옵션 박스 */
 .cheapest-detail-box {
     background: #ffffff;
     border: 1px dashed #6366f1;
@@ -321,7 +557,7 @@ body {
     margin-bottom: 16px;
 }
 
-.hidden { display: none; }
+.hidden { display: none !important; }
 
 .sub-info-row {
     display: flex;
@@ -375,7 +611,6 @@ body {
     background: #4338ca;
 }
 
-/* 경로 결과 카드 */
 .route-result-container {
     margin-top: 20px;
 }
@@ -436,6 +671,9 @@ body {
     .map-card {
         flex: auto;
         height: 320px;
+    }
+    .roulette-layout {
+        flex-direction: column;
     }
     .route-inputs {
         flex-direction: column;
