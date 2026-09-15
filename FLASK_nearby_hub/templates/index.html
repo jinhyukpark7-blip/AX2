@@ -14,6 +14,7 @@
         <!-- [상단 영역]: 지도 + 선택 위치 편의시설 정보 -->
         <section class="top-section">
             <div class="map-card">
+                <!-- 상단 검색창 및 고정 버튼 -->
                 <div class="map-header">
                     <div class="search-box">
                         <form id="search-form" onsubmit="searchLocation(event)">
@@ -26,12 +27,17 @@
                         <span id="lock-text">고정</span>
                     </button>
                 </div>
-                <div id="map"></div>
-                <div class="map-footer-toast" id="guide-badge">
-                    💡 클릭하여 핀 이동 후 [고정]을 누르세요.
+
+                <!-- 💡 요청하신 상단 안내 알림 바 (지도 바로 위) -->
+                <div class="map-top-notice-bar" id="map-top-notice">
+                    ⏳ <b>안내:</b> 원하는 위치를 지정하고 <b>[고정]</b>을 누르세요. (위치 고정 후 검색까지 시간이 약간 걸릴 수 있습니다)
                 </div>
+
+                <!-- 컴팩트 지도 -->
+                <div id="map"></div>
             </div>
 
+            <!-- 핀 위치 편의시설 요약 -->
             <div class="facility-summary-card">
                 <div class="section-title-box">
                     <h3>📍 핀 위치 주변 주요 시설</h3>
@@ -92,7 +98,7 @@
             </div>
         </section>
 
-        <!-- [중단 영역]: 신규 추가! 오늘의 한끼 / 오늘은 뭐 먹지 / 오늘의 편의점 -->
+        <!-- [중단 영역]: 오늘의 한끼 / 룰렛 / 편의점 -->
         <section class="food-convenience-section">
             <div class="food-tabs-header">
                 <button class="tab-menu active" onclick="switchFoodTab('tab-meal')">🍴 오늘의 한끼 (도보 10분)</button>
@@ -100,7 +106,7 @@
                 <button class="tab-menu" onclick="switchFoodTab('tab-cvs')">🏪 오늘의 편의점 & 재고찾기</button>
             </div>
 
-            <!-- 1. 오늘의 한끼 (도보 10분 식당 목록) -->
+            <!-- 1. 오늘의 한끼 (도보 10분 식당) -->
             <div id="tab-meal" class="food-tab-content">
                 <div class="tab-desc">
                     <h4>🚶‍♂️ 핀 기준 도보 10분(약 800m) 이내 식당 리스트</h4>
@@ -111,12 +117,12 @@
                 </div>
             </div>
 
-            <!-- 2. 오늘은 뭐 먹지 (원형 룰렛) -->
+            <!-- 2. 오늘은 뭐 먹지 (룰렛) -->
             <div id="tab-roulette" class="food-tab-content hidden">
                 <div class="roulette-layout">
                     <div class="roulette-box">
                         <div class="roulette-pointer">▼</div>
-                        <canvas id="roulette-canvas" width="360" height="360"></canvas>
+                        <canvas id="roulette-canvas" width="340" height="340"></canvas>
                         <button id="roulette-spin-btn" class="spin-btn" onclick="spinRoulette()">🎯 룰렛 돌리기!</button>
                     </div>
                     <div class="roulette-result-box">
@@ -128,10 +134,10 @@
                 </div>
             </div>
 
-            <!-- 3. 오늘의 편의점 (편의점 목록 + 재고조회 링크) -->
+            <!-- 3. 오늘의 편의점 -->
             <div id="tab-cvs" class="food-tab-content hidden">
                 <div class="cvs-util-banner">
-                    <p>💡 <b>편의점 상품/재고 & 좌석 확인 안내</b>: 실시간 재고 및 행사 상품은 브랜드별 앱/웹 조회를 활용해보세요.</p>
+                    <p>💡 <b>편의점 상품/재고 & 좌석 안내</b>: 브랜드별 공식 앱/웹을 통해 매장별 행사 및 재고를 확인해보세요.</p>
                     <div class="cvs-quick-links">
                         <a href="https://cu.bgfretail.com/store/list.do" target="_blank" class="cvs-badge cu">CU 매장/재고 ↗</a>
                         <a href="https://woodongs.page.link/find" target="_blank" class="cvs-badge gs">GS25 우리동네GS ↗</a>

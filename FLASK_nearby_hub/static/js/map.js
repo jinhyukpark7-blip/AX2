@@ -9,7 +9,7 @@ let isSpinning = false;
 let currentRotation = 0;
 let fetchTimeout = null;
 
-// 기본 기준 좌표: 서울특별시청 (을지로 인근)
+// 기본 기준 좌표: 서울특별시청
 const INITIAL_LAT = 37.5665;
 const INITIAL_LNG = 126.9780;
 
@@ -41,7 +41,7 @@ function initMap() {
     updateLocation(INITIAL_LAT, INITIAL_LNG, "서울특별시청");
 }
 
-// 🔍 검색
+// 🔍 검색 이동
 async function searchLocation(e) {
     e.preventDefault();
     if (isLocationLocked) {
@@ -73,14 +73,14 @@ async function searchLocation(e) {
     }
 }
 
-// 🔒 위치 고정
+// 🔒 위치 고정 토글
 function toggleLocationLock() {
     isLocationLocked = !isLocationLocked;
     const btn = document.getElementById("lock-btn");
     const icon = document.getElementById("lock-icon");
     const text = document.getElementById("lock-text");
     const statusTag = document.getElementById("status-tag");
-    const guideBadge = document.getElementById("guide-badge");
+    const topNotice = document.getElementById("map-top-notice");
 
     if (isLocationLocked) {
         myPinMarker.dragging.disable();
@@ -89,7 +89,9 @@ function toggleLocationLock() {
         text.innerText = "해제";
         statusTag.className = "status-tag locked";
         statusTag.innerText = "고정됨";
-        guideBadge.innerHTML = "🔒 <b>위치가 고정되었습니다.</b>";
+
+        topNotice.classList.add("locked");
+        topNotice.innerHTML = "🔒 <b>위치가 고정되었습니다.</b> (검색 및 데이터 조회까지 1~3초 정도 소요될 수 있습니다)";
     } else {
         myPinMarker.dragging.enable();
         btn.classList.remove("locked");
@@ -97,7 +99,9 @@ function toggleLocationLock() {
         text.innerText = "고정";
         statusTag.className = "status-tag unlocked";
         statusTag.innerText = "수정 가능";
-        guideBadge.innerHTML = "💡 클릭하여 핀 이동 후 [고정]을 누르세요.";
+
+        topNotice.classList.remove("locked");
+        topNotice.innerHTML = "⏳ <b>안내:</b> 원하는 위치를 지정하고 <b>[고정]</b>을 누르세요. (위치 고정 후 검색까지 시간이 약간 걸릴 수 있습니다)";
     }
 }
 
@@ -106,7 +110,6 @@ function updateLocation(lat, lng, labelName) {
     document.getElementById("picked-location-name").innerText = labelName || "지정된 위치";
     clearResultMarkers();
 
-    // 디바운스 적용 (연속 클릭 시 서버 과부하 방지)
     if (fetchTimeout) clearTimeout(fetchTimeout);
     setLoadingState();
 
@@ -290,7 +293,7 @@ function renderCvsList(cvsList) {
     `).join('');
 }
 
-// 룰렛 로직
+// 룰렛
 const colors = ["#6366f1", "#ec4899", "#f59e0b", "#10b981", "#3b82f6", "#8b5cf6", "#14b8a6", "#f97316"];
 
 function drawRoulette(restaurants) {

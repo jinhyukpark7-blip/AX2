@@ -99,24 +99,27 @@ body {
     border-color: #dc2626;
 }
 
+/* 💡 지도 상단 알림 바 스타일 */
+.map-top-notice-bar {
+    background: #f8fafc;
+    color: #475569;
+    font-size: 0.8rem;
+    padding: 7px 12px;
+    border-bottom: 1px solid #e2e8f0;
+    line-height: 1.35;
+    transition: all 0.3s ease;
+}
+
+.map-top-notice-bar.locked {
+    background: #fef2f2;
+    color: #b91c1c;
+    border-bottom-color: #fecaca;
+}
+
 #map {
     flex: 1;
     width: 100%;
-    min-height: 300px;
-}
-
-.map-footer-toast {
-    position: absolute;
-    bottom: 12px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(15, 23, 42, 0.85);
-    color: #fff;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 0.78rem;
-    z-index: 1000;
-    pointer-events: none;
+    min-height: 270px; /* 상단 바 높이만큼 조정 */
 }
 
 .facility-summary-card {
@@ -211,7 +214,7 @@ body {
     pointer-events: none;
 }
 
-/* ================== 신규 추가: 오늘의 한끼 / 룰렛 / 편의점 섹션 ================== */
+/* ================== 오늘의 한끼 / 룰렛 / 편의점 섹션 ================== */
 .food-convenience-section {
     background: #ffffff;
     border-radius: 16px;
@@ -270,7 +273,6 @@ body {
     border-radius: 20px;
 }
 
-/* 리스트 그리드 */
 .meal-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -337,7 +339,7 @@ body {
 .btn-route { background: #e0e7ff; color: #3730a3; }
 .btn-review { background: #f1f5f9; color: #475569; }
 
-/* 룰렛 스타일 */
+/* 룰렛 */
 .roulette-layout {
     display: flex;
     gap: 30px;
@@ -416,7 +418,7 @@ body {
     margin-bottom: 6px;
 }
 
-/* 편의점 배너 링크 */
+/* 편의점 배너 */
 .cvs-util-banner {
     background: #f8fafc;
     border: 1px solid #e2e8f0;
